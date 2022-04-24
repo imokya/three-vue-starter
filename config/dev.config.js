@@ -14,5 +14,6 @@ const devConfig = {
   }
 }
 
-module.exports = merge(commonConfig, devConfig)
+const finalConfig = merge(commonConfig, devConfig)
+module.exports = finalConfig
 

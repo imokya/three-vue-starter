@@ -2,7 +2,7 @@ const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const config = require('../config.json')
 const commonConfig = require('./common.config')
-const { merge } = require('webpack-merge')
+const { merge, mergeWithRules } = require('webpack-merge')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin')
 const TerserPlugin = require('terser-webpack-plugin')
@@ -46,5 +46,13 @@ const proConfig = {
 
 }
   
-module.exports = merge(commonConfig, proConfig)
+const finalConfig = mergeWithRules({
+  module: {
+    rules: {
+      test: 'match',
+      use: 'replace'
+    }
+  }
+})(commonConfig, proConfig)
+module.exports = finalConfig
 

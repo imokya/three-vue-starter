@@ -1,6 +1,9 @@
 const path = require('path')
+const webpack = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const config = require('../config.json')
+const { VueLoaderPlugin } = require('vue-loader')
+
 
 module.exports = {
   mode: 'development',
@@ -24,9 +27,14 @@ module.exports = {
     rules: [
 
       {
+        test: /\.vue$/,
+        loader: 'vue-loader'
+      },
+
+      {
         test: /\.css$/i,
         use: [
-          'style-loader',
+          'vue-style-loader',
           'css-loader',
           'postcss-loader'
         ]
@@ -35,7 +43,7 @@ module.exports = {
       {
         test: /\.s[ac]ss$/i,
         use: [
-          'style-loader',
+          'vue-style-loader',
           'css-loader',
           'sass-loader',
           'postcss-loader'
@@ -74,6 +82,11 @@ module.exports = {
       inject: 'body',
       title: config.title,
       publicPath: config.publicPath
+    }),
+    new VueLoaderPlugin(),
+    new webpack.DefinePlugin({
+      __VUE_OPTIONS_API__: false,
+      __VUE_PROD_DEVTOOLS__: false,
     })
   ]
 
