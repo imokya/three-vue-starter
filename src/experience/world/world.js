@@ -1,7 +1,6 @@
 import Experience from '../experience'
 import * as THREE from 'three'
 import Environment from './environment'
-import Env from './env'
 
 
 export default class World {
@@ -14,7 +13,6 @@ export default class World {
     
     this.resource.on('ready', () => {
       
-      this.env = new Env()
       this.environment = new Environment()      
     
     }) 
