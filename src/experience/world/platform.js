@@ -1,6 +1,6 @@
 import Experience from '../experience'
-import * as THREE from 'three'
 import { Reflector } from '../objects/Reflector'
+import { Mesh, Color, CircleGeometry, RepeatWrapping } from 'three'
 
 export default class Platform {
 
@@ -25,7 +25,7 @@ export default class Platform {
     this.model.scene.traverse(child => {
       if(child.isMesh) {
         if(child.material.name == material.name) {
-          child.material.color = new THREE.Color(material.color).convertSRGBToLinear()
+          child.material.color = new Color(material.color).convertSRGBToLinear()
         }
       }
     })
@@ -33,13 +33,13 @@ export default class Platform {
 
   _loadModel() {
     // const roughnessMap = this.resource.items.floorRoughnessMap
-    // roughnessMap.wrapS = THREE.RepeatWrapping
-    // roughnessMap.wrapT = THREE.RepeatWrapping
+    // roughnessMap.wrapS = RepeatWrapping
+    // roughnessMap.wrapT = RepeatWrapping
     // roughnessMap.repeat.set(1, 1)
     this.model.scene.traverse(child => {
-      if(child instanceof THREE.Mesh) {
+      if(child instanceof Mesh) {
         if(child.material.name == 'platform') {
-          child.material.color = new THREE.Color(0x000000)
+          child.material.color = new Color(0x000000)
           child.material.metalness = 1
           child.material.roughness = 0.2
           //child.material.roughnessMap = roughnessMap
@@ -48,24 +48,24 @@ export default class Platform {
         if(child.material.name == 'strip') {
           child.material.metalness = 0.8
           child.material.roughness = 0.4
-          child.material.color = new THREE.Color(0x999999)
+          child.material.color = new Color(0x999999)
         }
         if(child.material.name == 'face') {
           child.material.metalness = 1
           child.material.roughness = 0.6
-          child.material.color = new THREE.Color(0x000000)
+          child.material.color = new Color(0x000000)
           child.material.envMapIntensity = 0.3
         }
         if(child.material.name == 'plastic') {
           child.material.metalness = 0.4
           child.material.roughness = 0.5
-          child.material.color = new THREE.Color(0x000000)
+          child.material.color = new Color(0x000000)
           child.material.envMapIntensity = 0.6
         }
         if(child.material.name == 'rim') {
           child.material.metalness = 0.8
           child.material.roughness = 0.25
-          child.material.color = new THREE.Color(0x000000)
+          child.material.color = new Color(0x000000)
           child.material.envMapIntensity = 0.6
         }
       }
@@ -76,7 +76,7 @@ export default class Platform {
   }
 
   _createMirror() {
-    const geometry = new THREE.CircleGeometry(1.65, 64)
+    const geometry = new CircleGeometry(1.65, 64)
     const groundMirror = new Reflector(geometry, {
       clipBias: 0.003,
       textureWidth: window.innerWidth * window.devicePixelRatio,

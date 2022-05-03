@@ -4,7 +4,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 import { EXRLoader } from 'three/examples/jsm/loaders/EXRLoader'
 import { DDSLoader } from 'three/examples/jsm/loaders/DDSLoader'
 import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader'
-import * as THREE from 'three'
+import { TextureLoader, CubeTextureLoader } from 'three'
 import config from '../../../config.json'
 
 export default class Resource extends EventEmitter {
@@ -27,8 +27,8 @@ export default class Resource extends EventEmitter {
     this.loaders.dracoLoader.setDecoderPath(`${config.publicPath}/draco/`)
     this.loaders.gltfLoader.setDRACOLoader(this.loaders.dracoLoader)
     this.loaders.exrLoader = new EXRLoader()
-    this.loaders.textureLoader = new THREE.TextureLoader()
-    this.loaders.cubeTextureLoader = new THREE.CubeTextureLoader()
+    this.loaders.textureLoader = new TextureLoader()
+    this.loaders.cubeTextureLoader = new CubeTextureLoader()
     this.loaders.ddsLoader = new DDSLoader()
     this.loaders.rgbeLoader = new RGBELoader()
   }

@@ -13,8 +13,6 @@ import {
  	Scene,
 } from 'three';
 
-import * as THREE from 'three'
-
 class RoomEnvironment extends Scene {
 
 	constructor() {
@@ -139,7 +137,6 @@ class RoomEnvironment extends Scene {
 function createAreaLightMaterial( intensity ) {
 
 	const material = new MeshBasicMaterial();
-	//material.color = new THREE.Color(0xff0000)
 	material.color.setScalar( intensity * 0.7 );
 	return material;
 

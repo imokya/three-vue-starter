@@ -1,5 +1,5 @@
 import Experience from './experience'
-import * as THREE from 'three'
+import { WebGLRenderer, sRGBEncoding, ACESFilmicToneMapping, PCFSoftShadowMap } from 'three'
 import util from './utils'
 
 export default class Renderer {
@@ -16,22 +16,17 @@ export default class Renderer {
 
   setInstance() {
     const anti = util.isBugIOSVersion() ? false : true
-    this.instance = new THREE.WebGLRenderer({
+    this.instance = new WebGLRenderer({
       canvas: this.canvas,
-      // preserveDrawingBuffer: false,
       antialias: anti,
-      // alpha: true
+      alpha: true
     })
     this.instance.physicallyCorrectLights = false
-    this.instance.outputEncoding = THREE.sRGBEncoding
-    //this.instance.toneMapping = THREE.CineonToneMapping
-    //this.instance.toneMapping = THREE.ReinhardToneMapping //颜色更正
-    this.instance.toneMapping = THREE.ACESFilmicToneMapping
-    //this.instance.toneMapping = THREE.LinearToneMapping
-    //this.instance.toneMapping = THREE.NoToneMapping
+    this.instance.outputEncoding = sRGBEncoding
+    this.instance.toneMapping = ACESFilmicToneMapping
     this.instance.toneMappingExposure = 1.5
     this.instance.shadowMap.enabled = false
-    this.instance.shadowMap.type = THREE.PCFSoftShadowMap
+    this.instance.shadowMap.type = PCFSoftShadowMap
     this.instance.setPixelRatio(this.size.pixelRatio)
     this.instance.setSize(this.size.width, this.size.height)
   

@@ -1,5 +1,5 @@
 import Experience from '../experience'
-import * as THREE from 'three'
+import { Spherical, Vector3 } from 'three'
 
 export default class Controls {
 
@@ -15,7 +15,7 @@ export default class Controls {
   setView() {
     this.view = {}
     this.view.spherical = {}
-    this.view.spherical.origin = new THREE.Spherical(11, Math.PI * 0.5, 0)
+    this.view.spherical.origin = new Spherical(11, Math.PI * 0.5, 0)
     this.view.spherical.value = this.view.spherical.origin.clone()
     this.view.spherical.smoothed = this.view.spherical.value.clone()
     this.view.spherical.smoothing = 0.1
@@ -23,7 +23,7 @@ export default class Controls {
     this.view.spherical.limits = {}
     this.view.spherical.limits.phi = { min: 1, max: Math.PI * 0.5}
 
-    this.view.target = new THREE.Vector3(0, 0, 0)
+    this.view.target = new Vector3(0, 0, 0)
 
     this.view.drag = {}
     
@@ -90,7 +90,7 @@ export default class Controls {
     this.view.drag.delta.x = 0
     this.view.drag.delta.y = 0
 
-    const viewPosition = new THREE.Vector3()
+    const viewPosition = new Vector3()
     viewPosition.setFromSpherical(this.view.spherical.smoothed)
     this.camera.instance.position.copy(viewPosition)
 

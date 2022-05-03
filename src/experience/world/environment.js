@@ -1,6 +1,5 @@
 import Experience from '../experience'
-import * as THREE from 'three'
-import { RectAreaLightHelper } from 'three/examples/jsm/helpers/RectAreaLightHelper'
+import { PMREMGenerator } from 'three'
 import { RoomEnvironment } from '../objects/RoomEnvironment'
 
 export default class Environment {
@@ -15,15 +14,14 @@ export default class Environment {
   }
 
   setEnvMap() {
-    const pmremGenerator = new THREE.PMREMGenerator(this.renderer.instance) 
+    const pmremGenerator = new PMREMGenerator(this.renderer.instance) 
     //const envRenderTarget = pmremGenerator.fromEquirectangular(this.resource.items.envMap)
     const envRenderTarget = pmremGenerator.fromScene(new RoomEnvironment())
     this.scene.environment = envRenderTarget.texture
   }
 
   setLights() {
-    // const ambientLight = new THREE.AmbientLight(0xffffff, 2)
-    // this.scene.add(ambientLight)
+
   }
 
 }

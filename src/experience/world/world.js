@@ -1,5 +1,4 @@
 import Experience from '../experience'
-import * as THREE from 'three'
 import Environment from './environment'
 
 

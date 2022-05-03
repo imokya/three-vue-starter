@@ -4,9 +4,8 @@ import Camera from './camera'
 import Renderer from './renderer'
 import World from './world/world'
 
-import * as THREE from 'three'
+import { Scene, Mesh }from 'three'
 import Resource from './utils/resource'
-//import Controls from './utils/controls'
 import Debug from './utils/debug'
 import source from './source'
 
@@ -31,13 +30,12 @@ export default class Experience {
     this.size = new Size() 
     this.time = new Time()
 
-    this.scene = new THREE.Scene()
+    this.scene = new Scene()
     this.resource = new Resource(source)
     this.camera = new Camera()
     this.renderer = new Renderer()
 
     this.world = new World()
-
 
     this.size.on('resize', () => {
       this.resize()
@@ -64,7 +62,7 @@ export default class Experience {
     this.time.off('tick')
 
     this.scene.traverse((child) => {
-      if(child instanceof THREE.Mesh) {
+      if(child instanceof Mesh) {
         child.geometry.dispose()
         for(const key in child.material) {
           const value = child.material[key]
