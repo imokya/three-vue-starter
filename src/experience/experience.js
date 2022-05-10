@@ -4,7 +4,7 @@ import Camera from './camera'
 import Renderer from './renderer'
 import World from './world/world'
 
-import { Scene, Mesh }from 'three'
+import { Scene, Mesh } from 'three'
 import Resource from './utils/resource'
 import Debug from './utils/debug'
 import source from './source'
