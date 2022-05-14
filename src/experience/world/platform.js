@@ -1,15 +1,8 @@
 import Experience from '../experience'
-import {
-  Reflector
-} from '../objects/Reflector'
-import {
-  Mesh,
-  Color,
-  CircleGeometry
-} from 'three'
+import { Reflector } from '../objects/Reflector'
+import { Mesh, Color, CircleGeometry } from 'three'
 
 export default class Platform {
-
   constructor() {
     this.experience = new Experience()
     this.resource = this.experience.resource
@@ -26,9 +19,8 @@ export default class Platform {
     this.model.scene.visible = toggle
   }
 
-
   setMaterial(material) {
-    this.model.scene.traverse(child => {
+    this.model.scene.traverse((child) => {
       if (child.isMesh) {
         if (child.material.name == material.name) {
           child.material.color = new Color(material.color).convertSRGBToLinear()
@@ -42,7 +34,7 @@ export default class Platform {
     // roughnessMap.wrapS = RepeatWrapping
     // roughnessMap.wrapT = RepeatWrapping
     // roughnessMap.repeat.set(1, 1)
-    this.model.scene.traverse(child => {
+    this.model.scene.traverse((child) => {
       if (child instanceof Mesh) {
         if (child.material.name == 'platform') {
           child.material.color = new Color(0x000000)
@@ -94,5 +86,4 @@ export default class Platform {
     this.model.scene.add(groundMirror)
     this.groundMirror = groundMirror
   }
-
 }

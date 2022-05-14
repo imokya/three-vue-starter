@@ -2,16 +2,15 @@ import Experience from '../experience'
 import { Spherical, Vector3 } from 'three'
 
 export default class Controls {
-
   constructor() {
     this.experience = new Experience()
     this.camera = this.experience.camera
-    
+
     this.setView()
     this.setEvents()
     this.enabled = true
   }
-  
+
   setView() {
     this.view = {}
     this.view.spherical = {}
@@ -21,16 +20,16 @@ export default class Controls {
     this.view.spherical.smoothing = 0.1
 
     this.view.spherical.limits = {}
-    this.view.spherical.limits.phi = { min: 1, max: Math.PI * 0.5}
+    this.view.spherical.limits.phi = { min: 1, max: Math.PI * 0.5 }
 
     this.view.target = new Vector3(0, 0, 0)
 
     this.view.drag = {}
-    
+
     this.view.drag.delta = {}
     this.view.drag.delta.x = 0
     this.view.drag.delta.y = 0
-    
+
     this.view.drag.sensitivity = {}
     this.view.drag.sensitivity.min = 0.0005
     this.view.drag.sensitivity.max = 0.005
@@ -39,8 +38,6 @@ export default class Controls {
     this.view.drag.previous = {}
     this.view.drag.previous.x = 0
     this.view.drag.previous.y = 0
-
-    
   }
 
   setEvents() {
@@ -63,7 +60,6 @@ export default class Controls {
 
     this.view.onMouseDown = (_event) => {
       this.view.down(_event.clientX, _event.clientY)
-   
     }
     this.view.onMouseMove = (_event) => {
       this.view.move(_event.clientX, _event.clientY)
@@ -77,15 +73,20 @@ export default class Controls {
   }
 
   update() {
-    if(!this.enabled) return
-    this.view.spherical.value.theta -= this.view.drag.delta.x * this.view.drag.sensitivity.value
-    this.view.spherical.value.phi -= this.view.drag.delta.y * this.view.drag.sensitivity.value
+    if (!this.enabled) return
+    this.view.spherical.value.theta -=
+      this.view.drag.delta.x * this.view.drag.sensitivity.value
+    this.view.spherical.value.phi -=
+      this.view.drag.delta.y * this.view.drag.sensitivity.value
 
-    
     //this.view.spherical.value.phi = Math.min(Math.max(this.view.spherical.value.phi, this.view.spherical.limits.phi.min), this.view.spherical.limits.phi.max)
 
-    this.view.spherical.smoothed.phi += (this.view.spherical.value.phi - this.view.spherical.smoothed.phi) * this.view.spherical.smoothing
-    this.view.spherical.smoothed.theta += (this.view.spherical.value.theta - this.view.spherical.smoothed.theta) * this.view.spherical.smoothing
+    this.view.spherical.smoothed.phi +=
+      (this.view.spherical.value.phi - this.view.spherical.smoothed.phi) *
+      this.view.spherical.smoothing
+    this.view.spherical.smoothed.theta +=
+      (this.view.spherical.value.theta - this.view.spherical.smoothed.theta) *
+      this.view.spherical.smoothing
 
     this.view.drag.delta.x = 0
     this.view.drag.delta.y = 0
@@ -96,5 +97,4 @@ export default class Controls {
 
     this.camera.instance.lookAt(this.view.target)
   }
-
 }

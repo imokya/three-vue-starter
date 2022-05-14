@@ -3,7 +3,6 @@ import { Vector3, PerspectiveCamera } from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 
 export default class Camera {
-
   constructor() {
     this.experience = new Experience()
     this.size = this.experience.size
@@ -18,7 +17,7 @@ export default class Camera {
   reset() {
     this.instance.position.copy(this.capture)
   }
-  
+
   save() {
     this.position = this.instance.position.clone()
   }
@@ -55,9 +54,8 @@ export default class Camera {
   }
 
   update() {
-    if(this.controls) {
+    if (this.controls) {
       this.controls.update()
     }
   }
-  
 }

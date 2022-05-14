@@ -1,4 +1,6 @@
-import { createApp } from 'vue'
+import {
+  createApp
+} from 'vue'
 import './css/style.scss'
 
 import Experience from './experience/experience'

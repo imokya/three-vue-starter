@@ -1,20 +1,15 @@
-
-
 export default {
-
-  isBugIOSVersion: function() {
+  isBugIOSVersion: function () {
     const ua = navigator.userAgent.toLowerCase()
     const res = ua.match(/cpu iphone os (.*?) like mac os/)
-    if(res == null) {
+    if (res == null) {
       return false
     } else {
       let version = res[1].replace(/_/g, '.')
-      if(version >= '15') {
+      if (version >= '15') {
         return true
-      } 
+      }
     }
     return false
   }
-  
 }
-

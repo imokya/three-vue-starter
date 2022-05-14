@@ -1,4 +1,4 @@
-import EventEmitter from "./eventEmitter"
+import EventEmitter from "./eventEmitter" 
 
 export default class Size extends EventEmitter {
   
