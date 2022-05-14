@@ -5,14 +5,10 @@ import { EXRLoader } from 'three/examples/jsm/loaders/EXRLoader'
 import { DDSLoader } from 'three/examples/jsm/loaders/DDSLoader'
 import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader'
 
-import {
-  TextureLoader,
-  CubeTextureLoader
-} from 'three'
+import { TextureLoader, CubeTextureLoader } from 'three'
 import config from '../../../config.json'
 
 export default class Resource extends EventEmitter {
-
   constructor(source) {
     super()
     this.source = source
@@ -41,27 +37,27 @@ export default class Resource extends EventEmitter {
     for (const item of this.source) {
       const path = config.publicPath + item.path
       if (item.type == 'gltfModel') {
-        this.loaders.gltfLoader.load(path, file => {
+        this.loaders.gltfLoader.load(path, (file) => {
           this.sourceLoaded(item, file)
         })
       } else if (item.type == 'texture') {
-        this.loaders.textureLoader.load(path, file => {
+        this.loaders.textureLoader.load(path, (file) => {
           this.sourceLoaded(item, file)
         })
       } else if (item.type == 'cubeTexture') {
-        this.loaders.cubeTextureLoader.load(path, file => {
+        this.loaders.cubeTextureLoader.load(path, (file) => {
           this.sourceLoaded(item, file)
         })
       } else if (item.type == 'exrTexture') {
-        this.loaders.exrLoader.load(path, file => {
+        this.loaders.exrLoader.load(path, (file) => {
           this.sourceLoaded(item, file)
         })
       } else if (item.type == 'ddsTexture') {
-        this.loaders.ddsLoader.load(path, file => {
+        this.loaders.ddsLoader.load(path, (file) => {
           this.sourceLoaded(item, file)
         })
       } else if (item.type == 'rgbeTexture') {
-        this.loaders.rgbeLoader.load(path, file => {
+        this.loaders.rgbeLoader.load(path, (file) => {
           this.sourceLoaded(item, file)
         })
       }
@@ -76,5 +72,4 @@ export default class Resource extends EventEmitter {
       this.trigger('ready')
     }
   }
-
 }
