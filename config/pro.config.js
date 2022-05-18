@@ -42,10 +42,9 @@ const proConfig = {
       filename: 'css/[name].css?[contenthash]'
     }),
     new CleanWebpackPlugin()
-  ],
-
+  ]
 }
-  
+
 const finalConfig = mergeWithRules({
   module: {
     rules: {
@@ -55,4 +54,3 @@ const finalConfig = mergeWithRules({
   }
 })(commonConfig, proConfig)
 module.exports = finalConfig
-

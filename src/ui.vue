@@ -1,12 +1,8 @@
 <template>
-  <div class="ui">
-  
-  </div>
+  <div class="ui"></div>
 </template>
 
-<script setup>
-
-</script>
+<script setup></script>
 
 <style lang="scss" scoped>
 .ui {
@@ -15,5 +11,7 @@
   position: absolute;
   top: 0;
   left: 0;
+  width: 100%;
+  height: 100%;
 }
 </style>
