@@ -1,243 +1,258 @@
 import {
-	Color,
-	LinearFilter,
-	MathUtils,
-	Matrix4,
-	Mesh,
-	PerspectiveCamera,
-	Plane,
-	RGBFormat,
-	ShaderMaterial,
-	UniformsUtils,
-	Vector3,
-	Vector4,
-	WebGLRenderTarget
-} from 'three';
+  Color,
+  LinearFilter,
+  MathUtils,
+  Matrix4,
+  Mesh,
+  PerspectiveCamera,
+  Plane,
+  RGBFormat,
+  ShaderMaterial,
+  UniformsUtils,
+  Vector3,
+  Vector4,
+  WebGLRenderTarget
+} from 'three'
 
 import Experience from '../experience'
 
 class Reflector extends Mesh {
+  constructor(geometry, options = {}) {
+    super(geometry)
 
-	constructor( geometry, options = {} ) {
-		
+    this.type = 'Reflector'
 
-		super( geometry );
+    const scope = this
 
-		this.type = 'Reflector';
+    const color =
+      options.color !== undefined
+        ? new Color(options.color)
+        : new Color(0x7f7f7f)
+    const textureWidth = options.textureWidth || 512
+    const textureHeight = options.textureHeight || 512
+    const clipBias = options.clipBias || 0
+    const shader = options.shader || Reflector.ReflectorShader
 
-		const scope = this;
+    const reflectorPlane = new Plane()
+    const normal = new Vector3()
+    const reflectorWorldPosition = new Vector3()
+    const cameraWorldPosition = new Vector3()
+    const rotationMatrix = new Matrix4()
+    const lookAtPosition = new Vector3(0, 0, -1)
+    const clipPlane = new Vector4()
 
+    const view = new Vector3()
+    const target = new Vector3()
+    const q = new Vector4()
 
-		const color = ( options.color !== undefined ) ? new Color( options.color ) : new Color( 0x7F7F7F );
-		const textureWidth = options.textureWidth || 512;
-		const textureHeight = options.textureHeight || 512;
-		const clipBias = options.clipBias || 0;
-		const shader = options.shader || Reflector.ReflectorShader;
+    const textureMatrix = new Matrix4()
+    const virtualCamera = new PerspectiveCamera()
 
-		const reflectorPlane = new Plane();
-		const normal = new Vector3();
-		const reflectorWorldPosition = new Vector3();
-		const cameraWorldPosition = new Vector3();
-		const rotationMatrix = new Matrix4();
-		const lookAtPosition = new Vector3( 0, 0, - 1 );
-		const clipPlane = new Vector4();
+    const parameters = {
+      minFilter: LinearFilter,
+      magFilter: LinearFilter,
+      format: RGBFormat
+    }
 
-		const view = new Vector3();
-		const target = new Vector3();
-		const q = new Vector4();
+    const renderTarget = new WebGLRenderTarget(
+      textureWidth,
+      textureHeight,
+      parameters
+    )
 
-		const textureMatrix = new Matrix4();
-		const virtualCamera = new PerspectiveCamera();
+    if (
+      !MathUtils.isPowerOfTwo(textureWidth) ||
+      !MathUtils.isPowerOfTwo(textureHeight)
+    ) {
+      renderTarget.texture.generateMipmaps = false
+    }
 
-		const parameters = {
-			minFilter: LinearFilter,
-			magFilter: LinearFilter,
-			format: RGBFormat
-		};
+    const material = new ShaderMaterial({
+      uniforms: UniformsUtils.clone(shader.uniforms),
+      fragmentShader: shader.fragmentShader,
+      vertexShader: shader.vertexShader,
+      transparent: true
+    })
 
-		const renderTarget = new WebGLRenderTarget( textureWidth, textureHeight, parameters );
+    material.uniforms['tDiffuse'].value = renderTarget.texture
+    material.uniforms['color'].value = color
+    material.uniforms['textureMatrix'].value = textureMatrix
 
-		if ( ! MathUtils.isPowerOfTwo( textureWidth ) || ! MathUtils.isPowerOfTwo( textureHeight ) ) {
+    this.material = material
 
-			renderTarget.texture.generateMipmaps = false;
+    scope.count = 0
+    this.onBeforeRender = function (renderer, scene, camera) {
+      const car = scene.getObjectByName('car')
+      const inner = scene.getObjectByName('inner')
 
-		}
+      if (car && inner) {
+        car.visible = false
+        inner.visible = false
+      }
 
-		const material = new ShaderMaterial( {
-			uniforms: UniformsUtils.clone( shader.uniforms ),
-			fragmentShader: shader.fragmentShader,
-			vertexShader: shader.vertexShader,
-			transparent: true
-		} );
+      reflectorWorldPosition.setFromMatrixPosition(scope.matrixWorld)
+      cameraWorldPosition.setFromMatrixPosition(camera.matrixWorld)
 
-		material.uniforms[ 'tDiffuse' ].value = renderTarget.texture;
-		material.uniforms[ 'color' ].value = color;
-		material.uniforms[ 'textureMatrix' ].value = textureMatrix;
+      rotationMatrix.extractRotation(scope.matrixWorld)
 
-		this.material = material;
-	
-		scope.count = 0
-		this.onBeforeRender = function ( renderer, scene, camera ) {
+      normal.set(0, 0, 1)
+      normal.applyMatrix4(rotationMatrix)
 
-	
-			const car = scene.getObjectByName('car')
-			const inner = scene.getObjectByName('inner')
+      view.subVectors(reflectorWorldPosition, cameraWorldPosition)
 
-			if(car && inner) {
-				car.visible = false
-				inner.visible = false
-			}
-	
-			reflectorWorldPosition.setFromMatrixPosition( scope.matrixWorld );
-			cameraWorldPosition.setFromMatrixPosition( camera.matrixWorld );
+      // Avoid rendering when reflector is facing away
 
-			rotationMatrix.extractRotation( scope.matrixWorld );
+      if (view.dot(normal) > 0) return
 
-			normal.set( 0, 0, 1 );
-			normal.applyMatrix4( rotationMatrix );
+      view.reflect(normal).negate()
+      view.add(reflectorWorldPosition)
 
-			view.subVectors( reflectorWorldPosition, cameraWorldPosition );
+      rotationMatrix.extractRotation(camera.matrixWorld)
 
-			// Avoid rendering when reflector is facing away
+      lookAtPosition.set(0, 0, -1)
+      lookAtPosition.applyMatrix4(rotationMatrix)
+      lookAtPosition.add(cameraWorldPosition)
 
-			if ( view.dot( normal ) > 0 ) return;
+      target.subVectors(reflectorWorldPosition, lookAtPosition)
+      target.reflect(normal).negate()
+      target.add(reflectorWorldPosition)
 
-			view.reflect( normal ).negate();
-			view.add( reflectorWorldPosition );
+      virtualCamera.position.copy(view)
+      virtualCamera.up.set(0, 1, 0)
+      virtualCamera.up.applyMatrix4(rotationMatrix)
+      virtualCamera.up.reflect(normal)
+      virtualCamera.lookAt(target)
 
-			rotationMatrix.extractRotation( camera.matrixWorld );
+      virtualCamera.far = camera.far // Used in WebGLBackground
 
-			lookAtPosition.set( 0, 0, - 1 );
-			lookAtPosition.applyMatrix4( rotationMatrix );
-			lookAtPosition.add( cameraWorldPosition );
+      virtualCamera.updateMatrixWorld()
+      virtualCamera.projectionMatrix.copy(camera.projectionMatrix)
 
-			target.subVectors( reflectorWorldPosition, lookAtPosition );
-			target.reflect( normal ).negate();
-			target.add( reflectorWorldPosition );
+      // Update the texture matrix
+      textureMatrix.set(
+        0.5,
+        0.0,
+        0.0,
+        0.5,
+        0.0,
+        0.5,
+        0.0,
+        0.5,
+        0.0,
+        0.0,
+        0.5,
+        0.5,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      )
+      textureMatrix.multiply(virtualCamera.projectionMatrix)
+      textureMatrix.multiply(virtualCamera.matrixWorldInverse)
+      textureMatrix.multiply(scope.matrixWorld)
 
-			virtualCamera.position.copy( view );
-			virtualCamera.up.set( 0, 1, 0 );
-			virtualCamera.up.applyMatrix4( rotationMatrix );
-			virtualCamera.up.reflect( normal );
-			virtualCamera.lookAt( target );
+      // Now update projection matrix with new clip plane, implementing code from: http://www.terathon.com/code/oblique.html
+      // Paper explaining this technique: http://www.terathon.com/lengyel/Lengyel-Oblique.pdf
+      reflectorPlane.setFromNormalAndCoplanarPoint(
+        normal,
+        reflectorWorldPosition
+      )
+      reflectorPlane.applyMatrix4(virtualCamera.matrixWorldInverse)
 
-			virtualCamera.far = camera.far; // Used in WebGLBackground
+      clipPlane.set(
+        reflectorPlane.normal.x,
+        reflectorPlane.normal.y,
+        reflectorPlane.normal.z,
+        reflectorPlane.constant
+      )
 
-			virtualCamera.updateMatrixWorld();
-			virtualCamera.projectionMatrix.copy( camera.projectionMatrix );
+      const projectionMatrix = virtualCamera.projectionMatrix
 
-			// Update the texture matrix
-			textureMatrix.set(
-				0.5, 0.0, 0.0, 0.5,
-				0.0, 0.5, 0.0, 0.5,
-				0.0, 0.0, 0.5, 0.5,
-				0.0, 0.0, 0.0, 1.0
-			);
-			textureMatrix.multiply( virtualCamera.projectionMatrix );
-			textureMatrix.multiply( virtualCamera.matrixWorldInverse );
-			textureMatrix.multiply( scope.matrixWorld );
+      q.x =
+        (Math.sign(clipPlane.x) + projectionMatrix.elements[8]) /
+        projectionMatrix.elements[0]
+      q.y =
+        (Math.sign(clipPlane.y) + projectionMatrix.elements[9]) /
+        projectionMatrix.elements[5]
+      q.z = -1.0
+      q.w =
+        (1.0 + projectionMatrix.elements[10]) / projectionMatrix.elements[14]
 
-			// Now update projection matrix with new clip plane, implementing code from: http://www.terathon.com/code/oblique.html
-			// Paper explaining this technique: http://www.terathon.com/lengyel/Lengyel-Oblique.pdf
-			reflectorPlane.setFromNormalAndCoplanarPoint( normal, reflectorWorldPosition );
-			reflectorPlane.applyMatrix4( virtualCamera.matrixWorldInverse );
+      // Calculate the scaled plane vector
+      clipPlane.multiplyScalar(2.0 / clipPlane.dot(q))
 
-			clipPlane.set( reflectorPlane.normal.x, reflectorPlane.normal.y, reflectorPlane.normal.z, reflectorPlane.constant );
+      // Replacing the third row of the projection matrix
+      projectionMatrix.elements[2] = clipPlane.x
+      projectionMatrix.elements[6] = clipPlane.y
+      projectionMatrix.elements[10] = clipPlane.z + 1.0 - clipBias
+      projectionMatrix.elements[14] = clipPlane.w
 
-			const projectionMatrix = virtualCamera.projectionMatrix;
+      // Render
 
-			q.x = ( Math.sign( clipPlane.x ) + projectionMatrix.elements[ 8 ] ) / projectionMatrix.elements[ 0 ];
-			q.y = ( Math.sign( clipPlane.y ) + projectionMatrix.elements[ 9 ] ) / projectionMatrix.elements[ 5 ];
-			q.z = - 1.0;
-			q.w = ( 1.0 + projectionMatrix.elements[ 10 ] ) / projectionMatrix.elements[ 14 ];
+      renderTarget.texture.encoding = renderer.outputEncoding
 
-			// Calculate the scaled plane vector
-			clipPlane.multiplyScalar( 2.0 / clipPlane.dot( q ) );
+      scope.visible = false
 
-			// Replacing the third row of the projection matrix
-			projectionMatrix.elements[ 2 ] = clipPlane.x;
-			projectionMatrix.elements[ 6 ] = clipPlane.y;
-			projectionMatrix.elements[ 10 ] = clipPlane.z + 1.0 - clipBias;
-			projectionMatrix.elements[ 14 ] = clipPlane.w;
+      const currentRenderTarget = renderer.getRenderTarget()
 
-			// Render
+      const currentXrEnabled = renderer.xr.enabled
+      const currentShadowAutoUpdate = renderer.shadowMap.autoUpdate
 
+      renderer.xr.enabled = false // Avoid camera modification
+      renderer.shadowMap.autoUpdate = false // Avoid re-computing shadows
 
-			renderTarget.texture.encoding = renderer.outputEncoding;
+      renderer.setRenderTarget(renderTarget)
 
-			scope.visible = false;
+      renderer.state.buffers.depth.setMask(true) // make sure the depth buffer is writable so it can be properly cleared, see #18897
 
-			const currentRenderTarget = renderer.getRenderTarget();
+      if (renderer.autoClear === false) renderer.clear()
+      renderer.render(scene, virtualCamera)
 
-			const currentXrEnabled = renderer.xr.enabled;
-			const currentShadowAutoUpdate = renderer.shadowMap.autoUpdate;
+      renderer.xr.enabled = currentXrEnabled
+      renderer.shadowMap.autoUpdate = currentShadowAutoUpdate
 
-			renderer.xr.enabled = false; // Avoid camera modification
-			renderer.shadowMap.autoUpdate = false; // Avoid re-computing shadows
+      renderer.setRenderTarget(currentRenderTarget)
 
-			renderer.setRenderTarget( renderTarget );
-	
+      // Restore viewport
 
-			renderer.state.buffers.depth.setMask( true ); // make sure the depth buffer is writable so it can be properly cleared, see #18897
+      const viewport = camera.viewport
 
-			if ( renderer.autoClear === false ) renderer.clear();
-			renderer.render( scene, virtualCamera );
+      if (viewport !== undefined) {
+        renderer.state.viewport(viewport)
+      }
 
-			renderer.xr.enabled = currentXrEnabled;
-			renderer.shadowMap.autoUpdate = currentShadowAutoUpdate;
+      if (car && inner) {
+        car.visible = true
+        inner.visible = true
+      }
 
-			renderer.setRenderTarget( currentRenderTarget );
+      scope.visible = true
+    }
 
-			// Restore viewport
-
-			const viewport = camera.viewport;
-
-			if ( viewport !== undefined ) {
-
-				renderer.state.viewport( viewport );
-
-			}
-
-			if(car && inner) {
-				car.visible = true
-				inner.visible = true
-			}
-
-			scope.visible = true;
-
-		};
-
-		this.getRenderTarget = function () {
-
-			return renderTarget;
-
-		};
-
-	}
-
+    this.getRenderTarget = function () {
+      return renderTarget
+    }
+  }
 }
 
-Reflector.prototype.isReflector = true;
+Reflector.prototype.isReflector = true
 
 Reflector.ReflectorShader = {
+  uniforms: {
+    color: {
+      value: null
+    },
 
-	uniforms: {
+    tDiffuse: {
+      value: null
+    },
 
-		'color': {
-			value: null
-		},
+    textureMatrix: {
+      value: null
+    }
+  },
 
-		'tDiffuse': {
-			value: null
-		},
-
-		'textureMatrix': {
-			value: null
-		}
-
-	},
-
-	vertexShader: /* glsl */`
+  vertexShader: /* glsl */ `
 		uniform mat4 textureMatrix;
 		varying vec4 vUv;
 
@@ -254,7 +269,7 @@ Reflector.ReflectorShader = {
 
 		}`,
 
-	fragmentShader: /* glsl */`
+  fragmentShader: /* glsl */ `
 		uniform vec3 color;
 		uniform sampler2D tDiffuse;
 		varying vec4 vUv;
@@ -281,6 +296,6 @@ Reflector.ReflectorShader = {
 			gl_FragColor = vec4( blendOverlay( base.rgb, color ), 0.3 );
 
 		}`
-};
+}
 
-export { Reflector };
+export { Reflector }
