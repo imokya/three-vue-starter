@@ -15,9 +15,14 @@ export default class Resource extends EventEmitter {
     this.items = {}
     this.toLoad = this.source.length
     this.loaded = 0
-
-    this.setLoaders()
-    this.startLoading()
+    if (this.toLoad === 0) {
+      setTimeout(() => {
+        this.trigger('ready')
+      })
+    } else {
+      this.setLoaders()
+      this.startLoading()
+    }
   }
 
   setLoaders() {
@@ -67,7 +72,6 @@ export default class Resource extends EventEmitter {
   sourceLoaded(item, file) {
     this.items[item.name] = file
     this.loaded++
-
     if (this.loaded === this.toLoad) {
       this.trigger('ready')
     }
