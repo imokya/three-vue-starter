@@ -14,18 +14,6 @@ export default class Camera {
     this.setOrbitControls()
   }
 
-  reset() {
-    this.instance.position.copy(this.capture)
-  }
-
-  save() {
-    this.position = this.instance.position.clone()
-  }
-
-  restore() {
-    this.instance.position.copy(this.position)
-  }
-
   setInstance() {
     this.instance = new PerspectiveCamera(
       30,
