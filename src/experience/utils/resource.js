@@ -6,7 +6,7 @@ import { DDSLoader } from 'three/examples/jsm/loaders/DDSLoader'
 import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader'
 
 import { TextureLoader, CubeTextureLoader } from 'three'
-import config from '../../../config.json'
+import config from '../../../config'
 
 export default class Resource extends EventEmitter {
   constructor(source) {

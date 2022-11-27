@@ -1,9 +1,8 @@
 const path = require('path')
 const webpack = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
-const config = require('../config.json')
+const config = require('../config')
 const { VueLoaderPlugin } = require('vue-loader')
-
 
 module.exports = {
   mode: 'development',
@@ -19,13 +18,12 @@ module.exports = {
 
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, '../src'),
-    },
+      '@': path.resolve(__dirname, '../src')
+    }
   },
 
   module: {
     rules: [
-
       {
         test: /\.vue$/,
         loader: 'vue-loader'
@@ -33,21 +31,12 @@ module.exports = {
 
       {
         test: /\.css$/i,
-        use: [
-          'vue-style-loader',
-          'css-loader',
-          'postcss-loader'
-        ]
+        use: ['vue-style-loader', 'css-loader', 'postcss-loader']
       },
 
       {
         test: /\.s[ac]ss$/i,
-        use: [
-          'vue-style-loader',
-          'css-loader',
-          'sass-loader',
-          'postcss-loader'
-        ]
+        use: ['vue-style-loader', 'css-loader', 'sass-loader', 'postcss-loader']
       },
 
       {
@@ -55,7 +44,7 @@ module.exports = {
         type: 'asset',
         parser: {
           dataUrlCondition: {
-            maxSize: 10 * 1024 
+            maxSize: 10 * 1024
           }
         },
         generator: {
@@ -66,12 +55,8 @@ module.exports = {
       {
         test: /\.(glsl|frag|vert)$/,
         exclude: /node_modules/,
-        use: [
-          'raw-loader',
-          'glslify-loader'
-        ]
+        use: ['raw-loader', 'glslify-loader']
       }
-
     ]
   },
 
@@ -86,8 +71,7 @@ module.exports = {
     new VueLoaderPlugin(),
     new webpack.DefinePlugin({
       __VUE_OPTIONS_API__: false,
-      __VUE_PROD_DEVTOOLS__: false,
+      __VUE_PROD_DEVTOOLS__: false
     })
   ]
-
 }
