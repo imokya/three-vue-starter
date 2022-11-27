@@ -1,6 +1,6 @@
 const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
-const config = require('../config.json')
+const config = require('../config')
 const commonConfig = require('./common.config')
 const { merge } = require('webpack-merge')
 
@@ -16,4 +16,3 @@ const devConfig = {
 
 const finalConfig = merge(commonConfig, devConfig)
 module.exports = finalConfig
-
